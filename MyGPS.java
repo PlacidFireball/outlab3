@@ -16,10 +16,12 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class MyGPS {
 
-    private int[] distances;
-    public EdgePgm3[] edgeTo;
-    private GraphPgm3 graph;
+    /* MyGPS variables */
+    private int[] distances; // contains distances from source node to a destination
+    private EdgePgm3[] edgeTo; // edgeTo array for maintaining paths
+    private GraphPgm3 graph; // the graph
 
+    /* The constructor */
     public MyGPS(GraphPgm3 graph) {
         this.distances = new int[graph.numVertices];
         for (int i = 0; i < distances.length; i++) distances[i] = Integer.MAX_VALUE;
@@ -29,15 +31,18 @@ public class MyGPS {
     }
 
     public static void main(String[] args) {
+        // Make a new graph and a gps module from a provided file
         In in = new In(args[0]);
         GraphPgm3 graph = GraphPgm3.construct(in);
         MyGPS gps = new MyGPS(graph);
 
+        // Main loop
         String display = "The current graph has vertices from 1 to " + graph.numVertices +
                 "\nWould you like to:\n\t1: Find a new route\n\t2: Exit";
         In input = new In();
         while (true) {
             StdOut.println(display);
+            // get user input
             int userInput = input.readInt();
             if (userInput == 1) {
                 StdOut.println("Please enter the source node.");
@@ -45,9 +50,11 @@ public class MyGPS {
                 StdOut.println("Please enter a destination node.");
                 int dest = input.readInt();
                 long startTime = System.currentTimeMillis();
+                // run dijkstra's algorithm from user input
                 gps.dijkstra(source - 1, dest - 1);
                 long endTime = System.currentTimeMillis();
                 long elapsed = endTime - startTime;
+                // display relevant data
                 if (gps.distance(dest - 1) == Integer.MAX_VALUE) {
                     StdOut.println("There is no path from " + source + " to " + (dest - 1));
                 }
@@ -56,7 +63,6 @@ public class MyGPS {
                     gps.display(gps.path(dest - 1));
                     StdOut.printf("total distance:\t%d\n", gps.distance(dest - 1));
                 }
-
                 StdOut.println("Elapsed time: " + elapsed + "ms");
             }
             else if (userInput == 2) {
@@ -71,26 +77,11 @@ public class MyGPS {
 
     }
 
-    // TODO: minDist(boolean[] used, int[] distances, int v) -> [a, d : 10]
-    // [a, b : 30], [a, c : 25], [a, d : 10]
-    // TODO: relax(Edge e, int[] distances)
-
     public int distance(int v) {
         return distances[v];
     }
 
-    int minDist(int v) {
-        int lowestDistance = Integer.MAX_VALUE;
-        int lowestIndex = -1;
-        for (EdgePgm3 e : this.graph.adjacent[v]) {
-            if (e.getWeight() < lowestDistance) {
-                lowestDistance = e.getWeight();
-                lowestIndex = e.to();
-            }
-        }
-        return lowestIndex;
-    }
-
+    /* Display the path that dijkstra's algorithm finds */
     public void display(Iterable<EdgePgm3> path) {
         StringBuilder sb = new StringBuilder();
         sb.append("Shortest path: ");
@@ -108,6 +99,8 @@ public class MyGPS {
         StdOut.println(sb.toString());
     }
 
+    /* Constructs a path from the edgeTo array that the algorithm uses */
+    // function used from the lecture on 11/4/2020
     public Iterable<EdgePgm3> path(int v) {
         Stack<EdgePgm3> path = new Stack<EdgePgm3>();
         for (EdgePgm3 e = edgeTo[v]; e != null; e = edgeTo[e.from()]) {
@@ -116,19 +109,23 @@ public class MyGPS {
         return path;
     }
 
+    /* Relaxes an edge, based on algorithm from lecture with a few tweaks */
     private void relax(EdgePgm3 e, boolean[] used, MinPQ<EdgePgm3> pq) {
-        int v = e.from(), w = e.to();
+        int v = e.from(), w = e.to(); // grab the vertexes
+        // check if the distance of w needs to be updated
         if (distances[w] > distances[v] + e.getWeight()) {
-            distances[w] = distances[v] + e.getWeight();
-            edgeTo[w] = e;
-            if (!used[w]) {
-                used[w] = true;
+            distances[w] = distances[v] + e.getWeight(); // update it
+            edgeTo[w] = e; // change the edge for pathing
+            if (!used[w]) { // if w hasn't been added to the priority queue
+                used[w] = true; // mark it as added
+                // and add all it's adjacent edges
                 for (EdgePgm3 edge : graph.adjacent[w]) pq.insert(edge);
             }
         }
     }
 
     public int dijkstra(int p1, int p2) {
+        // Setup
         boolean[] used = new boolean[graph.numVertices];
         for (int i = 0; i < graph.numVertices; i++) {
             this.distances[i] = Integer.MAX_VALUE;
@@ -137,6 +134,7 @@ public class MyGPS {
         distances[p1] = 0;
         used[p1] = true;
 
+        // the pq
         MinPQ<EdgePgm3> pq = new MinPQ<>();
         pq.insert(graph.adjacent[p1].getFirst());
 
@@ -144,10 +142,12 @@ public class MyGPS {
             EdgePgm3 currEdge = pq.delMin();
             int v = currEdge.from();
             used[v] = true;
+            // relax each edge that is adjacent to v
             for (EdgePgm3 edge : graph.adjacent[v]) {
                 relax(edge, used, pq);
             }
         }
+        // return the shortest distance to p2
         return distance(p2);
     }
 
