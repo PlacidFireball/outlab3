@@ -1,0 +1,51 @@
+By Jared Weiss and Jacob Clostio
+
+Not really sure what we're meant to discuss here but here we are? We implemented Dijkstra's algorithm so hell yeah??
+
+running
+java-algs4 MyGPS graph.gr
+
+produces the following output:
+The current graph has vertices from 1 to 10
+Would you like to:
+	1: Find a new route
+	2: Exit
+1
+Please enter the source node.
+1
+Please enter a destination node.
+10
+Shortest path from 1 to 10:
+Shortest path: 1 -> 10
+total distance:	20
+Elapsed time: 1ms
+The current graph has vertices from 1 to 10
+Would you like to:
+	1: Find a new route
+	2: Exit
+1
+Please enter the source node.
+10
+Please enter a destination node.
+1
+There is no path from 10 to 0
+Elapsed time: 0ms
+The current graph has vertices from 1 to 10
+Would you like to:
+	1: Find a new route
+	2: Exit
+1
+Please enter the source node.
+1
+Please enter a destination node.
+6
+Shortest path from 1 to 6:
+Shortest path: 1 -> 5 -> 6
+total distance:	40
+Elapsed time: 0ms
+The current graph has vertices from 1 to 10
+Would you like to:
+	1: Find a new route
+	2: Exit
+2
+Exiting...
